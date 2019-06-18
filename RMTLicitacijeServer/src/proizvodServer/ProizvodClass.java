@@ -9,7 +9,7 @@ package proizvodServer;
  *
  * @author Luka
  */
-public class Proizvod {
+public class ProizvodClass {
     public int IDProizvoda;
     public String nazivProizvoda;
 
@@ -35,7 +35,7 @@ public class Proizvod {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Proizvod other = (Proizvod) obj;
+        final ProizvodClass other = (ProizvodClass) obj;
         if (this.IDProizvoda != other.IDProizvoda) {
             return false;
         }
@@ -58,12 +58,12 @@ public class Proizvod {
         return nazivProizvoda;
     }
 
-    public Proizvod(int IDProizvoda, String nazivProizvoda) {
+    public ProizvodClass(int IDProizvoda, String nazivProizvoda) {
         this.IDProizvoda = IDProizvoda;
         this.nazivProizvoda = nazivProizvoda;
     }
 
-    public Proizvod() {
+    public ProizvodClass() {
     }
     
 }
