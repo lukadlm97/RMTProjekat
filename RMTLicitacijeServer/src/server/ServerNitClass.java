@@ -18,12 +18,12 @@ import java.util.logging.Logger;
  *
  * @author Luka
  */
-public class ServerNit extends Thread{
+public class ServerNitClass extends Thread{
     BufferedReader ulazniTokOdKlijenta = null;
     PrintStream izlazniTokKaKlijentu = null;
     Socket soketZaKomunikaciju = null;
 
-    public ServerNit(Socket klijentSoket) {
+    public ServerNitClass(Socket klijentSoket) {
         this.soketZaKomunikaciju = klijentSoket;
     }
 
@@ -33,7 +33,7 @@ public class ServerNit extends Thread{
             ulazniTokOdKlijenta = new BufferedReader(new InputStreamReader(soketZaKomunikaciju.getInputStream()));
             izlazniTokKaKlijentu = new PrintStream(soketZaKomunikaciju.getOutputStream());
         } catch (IOException ex) {
-            Logger.getLogger(ServerNit.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

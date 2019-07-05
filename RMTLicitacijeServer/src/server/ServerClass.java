@@ -15,8 +15,8 @@ import java.util.logging.Logger;
  *
  * @author Luka
  */
-public class Server {
-    static ServerNit klijenti[] = new ServerNit[20];
+public class ServerClass {
+    static ServerNitClass klijenti[] = new ServerNitClass[20];
     
     public static void main(String[] args) {
            int port = 22272;
@@ -30,14 +30,14 @@ public class Server {
                 System.out.println("Klijent konektovan");
                 for(int i=0;i<klijenti.length;i++){
                     if(klijenti[i] == null){
-                        klijenti[i] = new ServerNit(klijentSoket);
+                        klijenti[i] = new ServerNitClass(klijentSoket);
                         klijenti[i].start();
                         break;
                     }
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerClass.class.getName()).log(Level.SEVERE, null, ex);
         }
            
            
