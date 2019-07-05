@@ -39,8 +39,5 @@ public class ServerClass {
         } catch (IOException ex) {
             Logger.getLogger(ServerClass.class.getName()).log(Level.SEVERE, null, ex);
         }
-           
-           
-          
     }
 }

@@ -52,6 +52,10 @@ public class KlijentClass implements Runnable{
         String linijaOdServera;
         try {
             while ((linijaOdServera = ulazniTokOdServera.readLine()) != null ) {
+                if(linijaOdServera.contains("Dovidjenja!")){
+                    System.out.println("Dovidjenja!");
+                    break;
+                }
                 System.out.println(linijaOdServera);
             }
         } catch (IOException ex) {
