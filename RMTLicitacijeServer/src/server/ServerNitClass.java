@@ -77,7 +77,7 @@ public class ServerNitClass extends Thread{
                 }
             }while(!prijavljen);
            // izlazniTokKaKlijentu.println(izbor);
-           izborPrijavljenMeni izborPrijavljen = izborPrijavljenMeni.Odajava;
+           izborPrijavljenMeni izborPrijavljen = izborPrijavljenMeni.Odjava;
            boolean odjava = true;
            do{
            prijavljenKorisnikMeni();
@@ -86,7 +86,7 @@ public class ServerNitClass extends Thread{
            if(izborPrijavljen == izborPrijavljenMeni.Stanje){
                proveraStanja();
            }
-           if(izborPrijavljen == izborPrijavljenMeni.Odajava){
+           if(izborPrijavljen == izborPrijavljenMeni.Odjava){
                izlazniTokKaKlijentu.println("Dovidjenja!");
                System.out.println(username+" se diskonektovao!");
                return;
