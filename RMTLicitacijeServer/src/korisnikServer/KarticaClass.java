@@ -23,7 +23,7 @@ public class KarticaClass {
     public KarticaClass(int IDKartice, TipKartice tipKartice, double iznos) {
         this.IDKartice = IDKartice;
         this.tipKartice = tipKartice;
-        this.iznos = 50;
+        this.iznos = 2000;
     }
 
     public KarticaClass() {
