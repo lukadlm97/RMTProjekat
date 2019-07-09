@@ -34,6 +34,14 @@ public class ServerNitClass extends Thread{
         registrovaniKorisnici = korisnici;
     }
 
+    private void validacijaUsername(String usernameTemp) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void validacijaPassword(String passwordTemp) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     
 
 
@@ -59,6 +67,7 @@ public class ServerNitClass extends Thread{
         try {
             ulazniTokOdKlijenta = new BufferedReader(new InputStreamReader(soketZaKomunikaciju.getInputStream()));
             izlazniTokKaKlijentu = new PrintStream(soketZaKomunikaciju.getOutputStream());
+            //obezbedi da moze meni sa brojem
             izborLogMeni izbor = izborLogMeni.Izlaz;
             boolean prijavljen = false;
             do{
@@ -82,6 +91,8 @@ public class ServerNitClass extends Thread{
            do{
            prijavljenKorisnikMeni();
            String izborTemp = ulazniTokOdKlijenta.readLine();
+            //try?catch,treba srediti da moze i sa brojem da se bira
+            //u sustini, parsirati u int i onda ubaciti dodatni uslov u ifu da moze i broj
            izborPrijavljen = izborPrijavljenMeni.valueOf(izborTemp);
            if(izborPrijavljen == izborPrijavljenMeni.Stanje){
                proveraStanja();
@@ -153,6 +164,7 @@ public class ServerNitClass extends Thread{
                 } catch (IOException ex) {
                     Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                 //try?catch
                 int IDKartice = Integer.parseInt(brojKartice);
                 KarticaClass novaKartica = new KarticaClass(IDKartice,KarticaClass.TipKartice.Debitna,2500);
                 for(KorisnikClass k:registrovaniKorisnici){
@@ -190,6 +202,10 @@ public class ServerNitClass extends Thread{
         izlazniTokKaKlijentu.println("Unesite korisnicko ime koje koristite: ");
         try {
             usernameTemp = ulazniTokOdKlijenta.readLine();
+            
+            //minimum 4 karaktera
+            validacijaUsername(usernameTemp);
+            
         } catch (IOException ex) {
             Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -200,6 +216,11 @@ public class ServerNitClass extends Thread{
         izlazniTokKaKlijentu.println("Unesite lozniku koju koristite: ");
         try {
             passwordTemp = ulazniTokOdKlijenta.readLine();
+            
+            //minimum 8 karaktera, jedno veliko slovo i cifra
+            validacijaPassword(passwordTemp);
+            
+            
         } catch (IOException ex) {
             Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -268,6 +289,7 @@ public class ServerNitClass extends Thread{
         } catch (IOException ex) {
             Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
         }
+         //try?catch
         IDKartice = Integer.parseInt(tempBrojKartice);
         izlazniTokKaKlijentu.println("Unesite iznos za dopunu: ");
         try {
@@ -275,6 +297,7 @@ public class ServerNitClass extends Thread{
         } catch (IOException ex) {
             Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
         }
+        //try?catch
         iznos = Double.parseDouble(tempIznos);
         for(KorisnikClass korisnik:registrovaniKorisnici){
             if(korisnik.getUsername().equals(username)){
