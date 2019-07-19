@@ -5,7 +5,14 @@
  */
 package server;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.reflect.TypeToken;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect.Type;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -22,17 +29,31 @@ public class ServerClass {
     static ServerNitClass klijenti[] = new ServerNitClass[20];
     public static LinkedList<KorisnikClass> korisnici = new LinkedList<KorisnikClass>();
     
-    public static void napraviKorisnike(){
-        KorisnikClass k = new KorisnikClass(0,"djole", "djole", "djole");
-        korisnici.add(k);
-        KorisnikClass k1 = new KorisnikClass(1, "djole", "djole","djole");
-        korisnici.add(k1);
+    public static void ucitajKorisnike(){
+       Gson gson = new GsonBuilder().setPrettyPrinting().create();
+       
+        try {
+            FileReader citac = new FileReader("files/korisnici.json");
+            java.lang.reflect.Type type = new TypeToken<LinkedList<KorisnikClass>>(){}.getType();
+            
+            LinkedList<KorisnikClass> korisniciTemp = gson.fromJson(citac, type);
+            
+            korisnici = korisniciTemp;
+            
+            citac.close();
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ServerClass.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ServerClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     
     public static void main(String[] args) {
            int port = 22272;
            Socket klijentSoket = null;
-           napraviKorisnike();
+           ucitajKorisnike();
         try {
             ServerSocket serverSoket = new ServerSocket(port);
             while(true){

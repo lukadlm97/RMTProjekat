@@ -5,7 +5,10 @@
  */
 package server;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -28,18 +31,51 @@ public class ServerNitClass extends Thread{
     LinkedList<KorisnikClass> registrovaniKorisnici = new LinkedList<KorisnikClass>();
     LinkedList<KorisnikClass> onlineKorisnici = new LinkedList<KorisnikClass>();
     String username = null;
+    int brojKorisnika = 0;
 
     ServerNitClass(Socket klijentSoket, LinkedList<KorisnikClass> korisnici) {
         soketZaKomunikaciju = klijentSoket;
         registrovaniKorisnici = korisnici;
+        brojKorisnika = korisnici.size() + 1;
     }
 
-    private void validacijaUsername(String usernameTemp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private boolean validacijaUsername(String usernameTemp) {
+         if(usernameTemp.length() < 4) {
+        	return false;
+        }
+        return true;
+    
     }
 
-    private void validacijaPassword(String passwordTemp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private boolean validacijaPassword(String passwordTemp) {
+        if(passwordTemp.length() < 8 || passwordTemp.toLowerCase().equals(passwordTemp)) {
+    		return false;
+    	}
+    	
+    	for(int i = 0; i < passwordTemp.length(); i++) {
+    		if(passwordTemp.charAt(i) >= 48 && passwordTemp.charAt(i) <= 57)
+    			return true;
+    	}
+    	
+    	return false;
+    }
+
+    private void dodavanjeNovogKorisnikaUFile() {
+        
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        
+        try {
+            FileWriter upisivac = new FileWriter("files/korisnici.json");
+            
+            String korisnikUString = gson.toJson(registrovaniKorisnici);
+             
+            upisivac.write(korisnikUString);
+           
+            
+            upisivac.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     
@@ -55,10 +91,12 @@ public class ServerNitClass extends Thread{
     }
     public enum izborPrijavljenMeni{
         Razgledanje,
+        Licitacija,
         Dopuna,
         Stanje,
         Istorija,
-        Odjava
+        Odjava,
+        Nedefinisano
     }
     
 
@@ -68,42 +106,66 @@ public class ServerNitClass extends Thread{
             ulazniTokOdKlijenta = new BufferedReader(new InputStreamReader(soketZaKomunikaciju.getInputStream()));
             izlazniTokKaKlijentu = new PrintStream(soketZaKomunikaciju.getOutputStream());
             //obezbedi da moze meni sa brojem
-            izborLogMeni izbor = izborLogMeni.Izlaz;
+            izborLogMeni izbor;
             boolean prijavljen = false;
             do{
+                izbor = izborLogMeni.Izlaz;
                 prijavljivanjeKorisnikaMeni();
                 String izborTemp = ulazniTokOdKlijenta.readLine();
-                izbor=izborLogMeni.valueOf(izborTemp);
-                if(izbor == izborLogMeni.Izlaz){
+                try{
+                    izbor=izborLogMeni.valueOf(izborTemp);
+                }catch(Exception e){
+                    System.out.println("Unet broj kao izbor");
+                }
+                if(izbor == izborLogMeni.Registracija || izborTemp.equals("2")){
+                    registracijaKorisnika();
+                    izbor = izborLogMeni.Registracija;
+                    }
+                if(izbor == izborLogMeni.Prijava || izborTemp.equals("1")){
+                    prijavljen = prijavaKorisnika();
+                    izbor = izborLogMeni.Prijava;
+                }
+                if(izbor == izborLogMeni.Izlaz || izborTemp.equals("3")){
                     izlazniTokKaKlijentu.println("Dovidjenja!");
                     return;
                     }
-                if(izbor == izborLogMeni.Registracija){
-                    registracijaKorisnika();
-                    }
-                if(izbor == izborLogMeni.Prijava){
-                    prijavljen = prijavaKorisnika();
-                }
             }while(!prijavljen);
            // izlazniTokKaKlijentu.println(izbor);
-           izborPrijavljenMeni izborPrijavljen = izborPrijavljenMeni.Odjava;
+           izborPrijavljenMeni izborPrijavljen;
            boolean odjava = true;
            do{
+           izborPrijavljen = izborPrijavljenMeni.Nedefinisano;
            prijavljenKorisnikMeni();
            String izborTemp = ulazniTokOdKlijenta.readLine();
             //try?catch,treba srediti da moze i sa brojem da se bira
             //u sustini, parsirati u int i onda ubaciti dodatni uslov u ifu da moze i broj
-           izborPrijavljen = izborPrijavljenMeni.valueOf(izborTemp);
-           if(izborPrijavljen == izborPrijavljenMeni.Stanje){
-               proveraStanja();
+           try{
+            izborPrijavljen = izborPrijavljenMeni.valueOf(izborTemp);
+           }catch(Exception e){
+               System.out.println("Unet je broj kao izbor");
            }
-           if(izborPrijavljen == izborPrijavljenMeni.Odjava){
+           
+           if(izborPrijavljen == izborPrijavljenMeni.Stanje || izborTemp.equals("4")){
+               proveraStanja();
+               izborPrijavljen = izborPrijavljenMeni.Stanje;
+           }else if(izborPrijavljen == izborPrijavljenMeni.Dopuna || izborTemp.equals("3")){
+               dopunaRacuna();
+                izborPrijavljen = izborPrijavljenMeni.Dopuna;
+           }else if(izborPrijavljen == izborPrijavljenMeni.Razgledanje || izborTemp.equals("1")){
+               izlazniTokKaKlijentu.println("RAZGLEDANJE");
+                izborPrijavljen = izborPrijavljenMeni.Razgledanje;
+           }else if(izborPrijavljen == izborPrijavljenMeni.Licitacija || izborTemp.equals("2")){
+               izlazniTokKaKlijentu.println("LICITACIJA");
+                izborPrijavljen = izborPrijavljenMeni.Licitacija;
+           }else if(izborPrijavljen == izborPrijavljenMeni.Istorija || izborTemp.equals("5")){
+               izlazniTokKaKlijentu.println("ISTORIJA");
+                izborPrijavljen = izborPrijavljenMeni.Istorija;
+           }else if(izborPrijavljen == izborPrijavljenMeni.Odjava || izborTemp.equals("6")){
                izlazniTokKaKlijentu.println("Dovidjenja!");
                System.out.println(username+" se diskonektovao!");
                return;
-           }
-           if(izborPrijavljen == izborPrijavljenMeni.Dopuna){
-               dopunaRacuna();
+           }else{
+               izlazniTokKaKlijentu.println("Greska u unosu");
            }
            }while(odjava);
             }   catch (IOException ex) {
@@ -122,10 +184,11 @@ public class ServerNitClass extends Thread{
     public void prijavljenKorisnikMeni(){
         izlazniTokKaKlijentu.println("Unesite:"
                 + "\n1.Razgledanje"
-                + "\n2.Dopuna"
-                + "\n3.Stanje"
-                + "\n4.Istorija"
-                + "\n5.Odjava"
+                +"\n2.Licitacija"
+                + "\n3.Dopuna"
+                + "\n4.Stanje"
+                + "\n5.Istorija"
+                + "\n6.Odjava"
                 + "\nUnesite Vas izbor:");
     }
     
@@ -141,19 +204,33 @@ public class ServerNitClass extends Thread{
         }
         izlazniTokKaKlijentu.println("Unesite korisnicko ime koje zelite da koristite: ");
         try {
-            username = ulazniTokOdKlijenta.readLine();
+          //omoguceno da unosi username, sve dok ne unese od 4+ karaktera
+        	username = ulazniTokOdKlijenta.readLine();
+        	boolean validanUsername = validacijaUsername(username);
+        	while(!validanUsername) {
+        		izlazniTokKaKlijentu.println("Username mora imati minimum 4 karaktera. Pokusajte ponovo!");
+        		username = ulazniTokOdKlijenta.readLine();
+        		validanUsername = validacijaUsername(username);
+        	}   
         } catch (IOException ex) {
             Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
         }
         izlazniTokKaKlijentu.println("Unesite lozinku koju zelite da koristite: ");
         try {
+            //omoguceno da unosi sifru sve dok ne ispuni ogranicenja
             password = ulazniTokOdKlijenta.readLine();
+            boolean validanPassword = validacijaPassword(password);
+            while(!validanPassword) {
+        		izlazniTokKaKlijentu.println("Password mora imati minimum 8 karaktera, barem jedno veliko slovo i barem jednu cifru. Pokusajte ponovo!");
+        		password = ulazniTokOdKlijenta.readLine();
+        		validanPassword = validacijaPassword(password);
+        	} 
         } catch (IOException ex) {
             Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         if(!validacija(imePrezime, username, password)){
-            KorisnikClass noviKorisnik = new KorisnikClass(2, imePrezime, username, password);
+            KorisnikClass noviKorisnik = new KorisnikClass(brojKorisnika++, imePrezime, username, password);
             registrovaniKorisnici.add(noviKorisnik);
             String brojKartice = null;
              boolean temp = false;
@@ -168,7 +245,7 @@ public class ServerNitClass extends Thread{
                 int IDKartice = Integer.parseInt(brojKartice);
                 KarticaClass novaKartica = new KarticaClass(IDKartice,KarticaClass.TipKartice.Debitna,2500);
                 for(KorisnikClass k:registrovaniKorisnici){
-                    if(noviKorisnik.equals(k)){
+                    if(noviKorisnik.IDKorisnika == k.IDKorisnika){
                         k.dodajKarticu(novaKartica);
                     }
                 }
@@ -186,6 +263,7 @@ public class ServerNitClass extends Thread{
                 }
             }while(temp);
             System.out.println(noviKorisnik.getUsername()+" se registrovao!");
+            dodavanjeNovogKorisnikaUFile();
             izlazniTokKaKlijentu.println("Uspesno ste se registrovali!");
         }else{
             izlazniTokKaKlijentu.println("Neuspesna registracija!");
@@ -204,7 +282,7 @@ public class ServerNitClass extends Thread{
             usernameTemp = ulazniTokOdKlijenta.readLine();
             
             //minimum 4 karaktera
-            validacijaUsername(usernameTemp);
+            //validacijaUsername(usernameTemp);
             
         } catch (IOException ex) {
             Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
@@ -218,7 +296,7 @@ public class ServerNitClass extends Thread{
             passwordTemp = ulazniTokOdKlijenta.readLine();
             
             //minimum 8 karaktera, jedno veliko slovo i cifra
-            validacijaPassword(passwordTemp);
+            //validacijaPassword(passwordTemp);
             
             
         } catch (IOException ex) {

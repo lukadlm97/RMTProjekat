@@ -1,0 +1,74 @@
+[
+  {
+    "IDKorisnika": 1,
+    "imePrezimeKorisnika": "v",
+    "username": "v",
+    "password": "v",
+    "karticeKorisnika": [
+      {
+        "IDKartice": 101,
+        "tipKartice": "Debitna",
+        "iznos": 2000.0
+      },
+      {
+        "IDKartice": 102,
+        "tipKartice": "Debitna",
+        "iznos": 2000.0
+      }
+    ]
+  },
+  {
+    "IDKorisnika": 2,
+    "imePrezimeKorisnika": "x",
+    "username": "x",
+    "password": "x",
+    "karticeKorisnika": [
+      {
+        "IDKartice": 1,
+        "tipKartice": "Debitna",
+        "iznos": 2000.0
+      },
+      {
+        "IDKartice": 2,
+        "tipKartice": "Debitna",
+        "iznos": 2000.0
+      }
+    ]
+  },
+  {
+    "IDKorisnika": 3,
+    "imePrezimeKorisnika": "z",
+    "username": "z",
+    "password": "z",
+    "karticeKorisnika": [
+      {
+        "IDKartice": 12341,
+        "tipKartice": "Debitna",
+        "iznos": 2000.0
+      },
+      {
+        "IDKartice": 90,
+        "tipKartice": "Debitna",
+        "iznos": 2000.0
+      }
+    ]
+  },
+  {
+    "IDKorisnika": 4,
+    "imePrezimeKorisnika": "Luka Radovanovic",
+    "username": "lukadlm97",
+    "password": "Neko145.",
+    "karticeKorisnika": [
+      {
+        "IDKartice": 22,
+        "tipKartice": "Debitna",
+        "iznos": 2000.0
+      },
+      {
+        "IDKartice": 90,
+        "tipKartice": "Debitna",
+        "iznos": 2000.0
+      }
+    ]
+  }
+]
