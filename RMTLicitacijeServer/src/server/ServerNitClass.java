@@ -60,41 +60,106 @@ public class ServerNitClass extends Thread{
     	return false;
     }
 
-    private void dodavanjeNovogKorisnikaUFile() {
-        
+    private void dodavanjeNovogKorisnikaUFile() { 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        
+       
         try {
             FileWriter upisivac = new FileWriter("files/korisnici.json");
-            
             String korisnikUString = gson.toJson(registrovaniKorisnici);
              
             upisivac.write(korisnikUString);
            
-            
             upisivac.close();
         } catch (IOException ex) {
             Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    private void razgledanjeArtikala() {
+        boolean razgledanje = true;
+        izborRazgledanjeMeni izbor = izborRazgledanjeMeni.Nedefinisano;
+        while(razgledanje){
+            zaglavljeRazgledanja();
+            String izborTemp="";
+            try {
+                izborTemp = ulazniTokOdKlijenta.readLine();
+            } catch (IOException ex) {
+                Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try{
+                izbor = izborRazgledanjeMeni.valueOf(izborTemp);
+            }catch(Exception e){
+                System.out.println("Verovatno je primljen broj");
+            }
+            if(izbor == izborRazgledanjeMeni.Sve || izborTemp.equals("1")){
+                izlazniTokKaKlijentu.println("SVE");
+                izbor = izborRazgledanjeMeni.Nedefinisano;
+            }else if(izbor == izborRazgledanjeMeni.Knjige || izborTemp.equals("2")){
+                izlazniTokKaKlijentu.println("Knjige");
+                  izbor = izborRazgledanjeMeni.Nedefinisano;
+            }
+            else if(izbor == izborRazgledanjeMeni.Kozmetika || izborTemp.equals("3")){
+                izlazniTokKaKlijentu.println("Kozmetika");
+                 izbor = izborRazgledanjeMeni.Nedefinisano;
+            }else if(izbor == izborRazgledanjeMeni.KucniAparati|| izborTemp.equals("4") || izborTemp.equals("Kucni aparati")){
+                izlazniTokKaKlijentu.println("Kucni aparati");
+                  izbor = izborRazgledanjeMeni.Nedefinisano;
+            }else if(izbor == izborRazgledanjeMeni.MuzickaOprema || izborTemp.equals("5") || izborTemp.equals("Muzicka oprema")){
+               izlazniTokKaKlijentu.println("Muzicka oprema");
+              izbor = izborRazgledanjeMeni.Nedefinisano;
+            }else if(izbor == izborRazgledanjeMeni.SportskaOprema || izborTemp.equals("6") || izborTemp.equals("Sportska oprema")){
+               izlazniTokKaKlijentu.println("Sportska oprema");
+                  izbor = izborRazgledanjeMeni.Nedefinisano;
+            }else if(izbor == izborRazgledanjeMeni.Odjava || izborTemp.equals("7")){
+                razgledanje = false;
+                 izbor = izborRazgledanjeMeni.Nedefinisano;
+                return;
+            }else{
+                System.out.println("Neispravan unos!");
+                izbor = izborRazgledanjeMeni.Nedefinisano;
+            }
+        }
     
+    }
 
-
-
-
+    public void zaglavljeRazgledanja(){
+                izlazniTokKaKlijentu.println("Razgledajte:"
+                + "\n1.Sve"
+                        + "\n"
+                +"\n***Razgledajte i po kategorijama sa sledecim izborima:***"
+                +"\n2.Knjige"
+                + "\n3.Kozmetika"
+                + "\n4.Kucni aparati"
+                + "\n5.Muzicka oprema"
+                + "\n6.Sportska oprema"
+                        + "\n"
+                +"\n7.Odjava"
+                + "\nUnesite Vas izbor:");
+    }
     
     public enum izborLogMeni{
         Prijava,
         Registracija,
         Izlaz   
     }
+    
     public enum izborPrijavljenMeni{
         Razgledanje,
         Licitacija,
         Dopuna,
         Stanje,
         Istorija,
+        Odjava,
+        Nedefinisano
+    }
+    
+    public enum izborRazgledanjeMeni{
+        Sve,
+        Knjige,
+        Kozmetika,
+        KucniAparati,
+        MuzickaOprema,
+        SportskaOprema,
         Odjava,
         Nedefinisano
     }
@@ -152,7 +217,7 @@ public class ServerNitClass extends Thread{
                dopunaRacuna();
                 izborPrijavljen = izborPrijavljenMeni.Dopuna;
            }else if(izborPrijavljen == izborPrijavljenMeni.Razgledanje || izborTemp.equals("1")){
-               izlazniTokKaKlijentu.println("RAZGLEDANJE");
+               razgledanjeArtikala();
                 izborPrijavljen = izborPrijavljenMeni.Razgledanje;
            }else if(izborPrijavljen == izborPrijavljenMeni.Licitacija || izborTemp.equals("2")){
                izlazniTokKaKlijentu.println("LICITACIJA");
