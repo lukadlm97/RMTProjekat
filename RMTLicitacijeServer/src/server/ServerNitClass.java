@@ -19,6 +19,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import korisnikServer.KarticaClass;
 import korisnikServer.KorisnikClass;
+import proizvodServer.KnjigaClass;
+import proizvodServer.ProizvodClass;
+import proizvodServer.StavkaProizvodaClass;
 
 /**
  *
@@ -30,13 +33,17 @@ public class ServerNitClass extends Thread{
     Socket soketZaKomunikaciju = null;
     LinkedList<KorisnikClass> registrovaniKorisnici = new LinkedList<KorisnikClass>();
     LinkedList<KorisnikClass> onlineKorisnici = new LinkedList<KorisnikClass>();
+    LinkedList<StavkaProizvodaClass> proizvodiUBazi = new LinkedList<>();
     String username = null;
     int brojKorisnika = 0;
+    int brojProizvoda = 0;
 
-    ServerNitClass(Socket klijentSoket, LinkedList<KorisnikClass> korisnici) {
+    ServerNitClass(Socket klijentSoket, LinkedList<KorisnikClass> korisnici,LinkedList<StavkaProizvodaClass> poizvodi) {
         soketZaKomunikaciju = klijentSoket;
         registrovaniKorisnici = korisnici;
         brojKorisnika = korisnici.size() + 1;
+        proizvodiUBazi = poizvodi;
+        brojProizvoda = poizvodi.size()+1;
     }
 
     private boolean validacijaUsername(String usernameTemp) {
@@ -137,6 +144,151 @@ public class ServerNitClass extends Thread{
                 + "\nUnesite Vas izbor:");
     }
     
+    public void zaglavljeZaDodavanjeProizvoda(){
+        izlazniTokKaKlijentu.println("Unesite broj za odgovarajucu kategoriju proizvoda:"
+                + "\n1. Knjige"
+                + "\n2. Kozmetika"
+                + "\n3. Kucni aparati"
+                + "\n4. Muzicka oprema"
+                + "\n5. Sportska oprema"
+                + "\n6. Ostalo"
+                + "\n7. Odjava"
+                + "\nUnesite izbor:");
+        
+    }
+
+    private void dodavanjeNovogProizvoda() {
+        int izbor = -1;
+         String izborS = "";
+        while(izbor != 7){
+            zaglavljeZaDodavanjeProizvoda();
+            try {
+                izborS = ulazniTokOdKlijenta.readLine();
+            } catch (IOException ex) {
+                Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try{
+                izbor = Integer.parseInt(izborS);
+            }catch(Exception e){
+                izlazniTokKaKlijentu.println("Neispravan format unosa zelje!");
+            }
+            if(izbor == 1){
+                dodavanjeKnjige();
+            }else if(izbor == 2){
+                dodavanjeKozmetike();
+            }else if(izbor == 3){
+                dodavanjeKucnihAparata();
+            }else if(izbor == 4){
+                dodavanjeMuzickeOpreme();
+            }else if(izbor == 5){
+                dodavanjeSportskeOpreme();
+            }else if(izbor == 6){
+                dodavanjeOstalihProizvoda();
+            }else{
+                return;
+            }
+        }
+    }
+
+    private void dodavanjeKnjige() {
+        String nazivKnjige ="";
+        String autorKnjige = "";
+        String izdavacKnjige = "";
+        String godinaIzdanja = "nepoznato";
+        int godinaIzdanjaInt = 0;
+        double pocetnaCena = 1000;
+        String pocetnaCenaString="";
+        izlazniTokKaKlijentu.println("Unosenje informacija o knjizi"
+                + "\nUnesite naziv knjige: ");
+        try {
+            nazivKnjige = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        izlazniTokKaKlijentu.println("Unesite autora knjige: ");
+        try {
+            autorKnjige = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        izlazniTokKaKlijentu.println("Unesite izdavaca knjige: ");
+        try {
+            izdavacKnjige = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        izlazniTokKaKlijentu.println("Unesite godinu izdanja ako je poznata, ako ne napisite nepoznato: ");
+        try {
+            godinaIzdanja = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try{
+            godinaIzdanjaInt = Integer.parseInt(godinaIzdanja);
+        }catch(Exception e){
+            godinaIzdanja = "nepoznata";
+        }
+        izlazniTokKaKlijentu.println("Unesite pocetnu cenu (NAPOMENA: Ukoliko je cena uneta nepravilo automatski se nudi po ceni od 1000 dinara):");
+        try {
+            pocetnaCenaString = ulazniTokOdKlijenta.readLine();
+            pocetnaCena = Double.parseDouble(pocetnaCenaString);
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }catch(Exception e){
+            pocetnaCena = 1000;
+        }
+        KnjigaClass novaKnjiga = null;
+        if(godinaIzdanja.equals("nepoznata")){
+           novaKnjiga = new KnjigaClass(autorKnjige, izdavacKnjige, -1, brojProizvoda++, nazivKnjige);
+        }else{
+             novaKnjiga = new KnjigaClass(autorKnjige, izdavacKnjige, godinaIzdanjaInt, brojProizvoda++, nazivKnjige);
+        }
+        StavkaProizvodaClass noviProizvod = new StavkaProizvodaClass(novaKnjiga, username, pocetnaCena,null);
+        proizvodiUBazi.add(noviProizvod);
+        
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+       
+        try {
+            FileWriter upisivac = new FileWriter("files/proizvodi.json");
+            String proizvodUString = gson.toJson(proizvodiUBazi);
+             
+            upisivac.write(proizvodUString);
+            izlazniTokKaKlijentu.println("Uspesan unos proizvoda za licitaciju!");
+            upisivac.close();
+            return;
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        izlazniTokKaKlijentu.println("Neuspesno unosenje proizvoda za licitaciju!");
+    }
+
+    private void dodavanjeKozmetike() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void dodavanjeKucnihAparata() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void dodavanjeMuzickeOpreme() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void dodavanjeSportskeOpreme() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void dodavanjeOstalihProizvoda() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void unosProizvodaUBazu(ProizvodClass noviProizvod, double pocetnaCena, String username) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+   
+
+   
     public enum izborLogMeni{
         Prijava,
         Registracija,
@@ -149,6 +301,7 @@ public class ServerNitClass extends Thread{
         Dopuna,
         Stanje,
         Istorija,
+        DodavanjeNovogProizovda,
         Odjava,
         Nedefinisano
     }
@@ -225,7 +378,11 @@ public class ServerNitClass extends Thread{
            }else if(izborPrijavljen == izborPrijavljenMeni.Istorija || izborTemp.equals("5")){
                izlazniTokKaKlijentu.println("ISTORIJA");
                 izborPrijavljen = izborPrijavljenMeni.Istorija;
-           }else if(izborPrijavljen == izborPrijavljenMeni.Odjava || izborTemp.equals("6")){
+           }else if(izborPrijavljen == izborPrijavljenMeni.DodavanjeNovogProizovda || izborTemp.equals("6")){
+                dodavanjeNovogProizvoda();
+                izborPrijavljen = izborPrijavljenMeni.DodavanjeNovogProizovda;
+           }
+           else if(izborPrijavljen == izborPrijavljenMeni.Odjava || izborTemp.equals("7")){
                izlazniTokKaKlijentu.println("Dovidjenja!");
                System.out.println(username+" se diskonektovao!");
                return;
@@ -253,7 +410,8 @@ public class ServerNitClass extends Thread{
                 + "\n3.Dopuna"
                 + "\n4.Stanje"
                 + "\n5.Istorija"
-                + "\n6.Odjava"
+                +"\n6.Dodaj novi proizvod"
+                + "\n7.Odjava"
                 + "\nUnesite Vas izbor:");
     }
     

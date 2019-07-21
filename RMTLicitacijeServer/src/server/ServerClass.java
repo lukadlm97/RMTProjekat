@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import korisnikServer.KorisnikClass;
+import proizvodServer.StavkaProizvodaClass;
 
 /**
  *
@@ -28,6 +29,7 @@ import korisnikServer.KorisnikClass;
 public class ServerClass {
     static ServerNitClass klijenti[] = new ServerNitClass[20];
     public static LinkedList<KorisnikClass> korisnici = new LinkedList<KorisnikClass>();
+    public static LinkedList<StavkaProizvodaClass> proizvodiZaLicitaciju = new LinkedList<StavkaProizvodaClass>();
     
     public static void ucitajKorisnike(){
        Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -50,10 +52,31 @@ public class ServerClass {
         
     }
     
+    public static void ucitajProizvode(){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        
+        try {
+            FileReader citac = new FileReader("files/proizvodi.json");
+            java.lang.reflect.Type type = new TypeToken<LinkedList<StavkaProizvodaClass>>(){}.getType();
+            
+            LinkedList<StavkaProizvodaClass> prozivodiTemp = gson.fromJson(citac, type);
+            
+            proizvodiZaLicitaciju = prozivodiTemp;
+            
+            citac.close();
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ServerClass.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ServerClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public static void main(String[] args) {
            int port = 22272;
            Socket klijentSoket = null;
            ucitajKorisnike();
+           ucitajProizvode();
         try {
             ServerSocket serverSoket = new ServerSocket(port);
             while(true){
@@ -62,7 +85,7 @@ public class ServerClass {
                 System.out.println("Klijent konektovan");
                 for(int i=0;i<klijenti.length;i++){
                     if(klijenti[i] == null){
-                        klijenti[i] = new ServerNitClass(klijentSoket,korisnici);
+                        klijenti[i] = new ServerNitClass(klijentSoket,korisnici,proizvodiZaLicitaciju);
                         klijenti[i].start();
                         break;
                     }

@@ -1,0 +1,29 @@
+[
+  {
+    "proizvod": {
+      "IDProizvoda": 1,
+      "nazivProizvoda": "ada"
+    },
+    "vlasnik": "lukadlm97",
+    "cena": 300.0
+  },
+  {
+    "proizvod": {
+      "IDProizvoda": 2,
+      "nazivProizvoda": "apodspa"
+    },
+    "vlasnik": "lukadlm97",
+    "cena": 550.0
+  },
+  {
+    "proizvod": {
+      "autor": "mkdam",
+      "izdavac": "okpokad",
+      "godinaIzdanja": 2001,
+      "IDProizvoda": 3,
+      "nazivProizvoda": "poapda"
+    },
+    "vlasnik": "lukadlm97",
+    "cena": 900.0
+  }
+]
