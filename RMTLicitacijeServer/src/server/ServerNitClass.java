@@ -20,7 +20,13 @@ import java.util.logging.Logger;
 import korisnikServer.KarticaClass;
 import korisnikServer.KorisnikClass;
 import proizvodServer.KnjigaClass;
+import proizvodServer.KozmetikaClass;
+import proizvodServer.KozmetikaClass.Pol;
+import proizvodServer.KucniAparatiClass;
+import proizvodServer.MuzickaOpremaClass;
+import proizvodServer.MuzickaOpremaClass.KategorijaMuzickeOpreme;
 import proizvodServer.ProizvodClass;
+import proizvodServer.SportskaOpremaClass;
 import proizvodServer.StavkaProizvodaClass;
 
 /**
@@ -174,16 +180,22 @@ public class ServerNitClass extends Thread{
             }
             if(izbor == 1){
                 dodavanjeKnjige();
+                return;
             }else if(izbor == 2){
                 dodavanjeKozmetike();
+                return;
             }else if(izbor == 3){
                 dodavanjeKucnihAparata();
+                return;
             }else if(izbor == 4){
                 dodavanjeMuzickeOpreme();
+                return;
             }else if(izbor == 5){
                 dodavanjeSportskeOpreme();
+                return;
             }else if(izbor == 6){
                 dodavanjeOstalihProizvoda();
+                return;
             }else{
                 return;
             }
@@ -246,6 +258,10 @@ public class ServerNitClass extends Thread{
         StavkaProizvodaClass noviProizvod = new StavkaProizvodaClass(novaKnjiga, username, pocetnaCena,null);
         proizvodiUBazi.add(noviProizvod);
         
+        dodavanjeProizvodaUBazu();
+    }
+
+    public void dodavanjeProizvodaUBazu(){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
        
         try {
@@ -261,33 +277,225 @@ public class ServerNitClass extends Thread{
         }
         izlazniTokKaKlijentu.println("Neuspesno unosenje proizvoda za licitaciju!");
     }
-
+    
     private void dodavanjeKozmetike() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String nazivProizvoda = "";
+        String proizvodjac = "";
+        String namena = "";
+        String pocetnaCenaString = "";
+        double pocetnaCena = 1000;
+        Pol namenjenZaPol = Pol.Zenski;
+        izlazniTokKaKlijentu.println("Unosenje informacija o kozmetici"
+                + "\nUnesite naziv proizvoda: ");
+        try {
+            nazivProizvoda = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        izlazniTokKaKlijentu.println("Unesite naziv proizvodjaca:");
+        try {
+            proizvodjac = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        izlazniTokKaKlijentu.println("Da li je prozivod namenjen zenskom polu (DA-Da-dA-da ukoliko jeste):");
+        try {
+            namena = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if(namena.toLowerCase().equals("da")){
+            
+        }else{
+            namenjenZaPol = Pol.Muski;
+        }
+        KozmetikaClass noviProizvod = new KozmetikaClass(proizvodjac, namenjenZaPol, brojProizvoda++, nazivProizvoda);
+        izlazniTokKaKlijentu.println("Unesite pocetnu cenu (NAPOMENA: Ukoliko je cena uneta nepravilo automatski se nudi po ceni od 1000 dinara):");
+        try {
+            pocetnaCenaString = ulazniTokOdKlijenta.readLine();
+            pocetnaCena = Double.parseDouble(pocetnaCenaString);
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }catch(Exception e){
+            pocetnaCena = 1000;
+        }
+        StavkaProizvodaClass novaStavka = new StavkaProizvodaClass(noviProizvod, username, pocetnaCena, null);
+        
+        proizvodiUBazi.add(novaStavka);
+        
+        dodavanjeProizvodaUBazu();
     }
 
     private void dodavanjeKucnihAparata() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String nazivProizvoda = "";
+        String proizvodjac = "";
+        String godinaProizvodnjeString = "nepoznata";
+        int godinaProizvodnje = 0;
+        String pocetnaCenaString = "";
+        double pocetnaCena = 1000;
+        KucniAparatiClass noviProizvod=null;
+        izlazniTokKaKlijentu.println("Unosenje informacija o kucnom aparatu"
+                + "\nUnesite naziv proizvoda: ");
+        try {
+            nazivProizvoda = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        izlazniTokKaKlijentu.println("Unesite naziv proizvodjaca:");
+        try {
+            proizvodjac = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        izlazniTokKaKlijentu.println("Unesite godinu proizvodnje ako je poznata, ako ne napisite nepoznato: ");
+        try {
+            godinaProizvodnjeString = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try{
+            godinaProizvodnje = Integer.parseInt(godinaProizvodnjeString);
+        }catch(Exception e){
+            godinaProizvodnjeString = "nepoznata";
+        }
+        if(godinaProizvodnjeString.equals("nepoznata")){
+             noviProizvod = new KucniAparatiClass(proizvodjac, -1, brojProizvoda++, nazivProizvoda);
+        }else{
+             noviProizvod = new KucniAparatiClass(proizvodjac,godinaProizvodnje, brojProizvoda++, nazivProizvoda);
+        }
+        izlazniTokKaKlijentu.println("Unesite pocetnu cenu (NAPOMENA: Ukoliko je cena uneta nepravilo automatski se nudi po ceni od 1000 dinara):");
+        try {
+            pocetnaCenaString = ulazniTokOdKlijenta.readLine();
+            pocetnaCena = Double.parseDouble(pocetnaCenaString);
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }catch(Exception e){
+            pocetnaCena = 1000;
+        }
+        
+        StavkaProizvodaClass novaStavka = new StavkaProizvodaClass(noviProizvod, username, pocetnaCena, null);
+        
+        proizvodiUBazi.add(novaStavka);
+        
+        dodavanjeProizvodaUBazu();
     }
 
     private void dodavanjeMuzickeOpreme() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String nazivProizvoda = "";
+        String proizvodjac = "";
+        String godinaProizvodnjeString = "nepoznata";
+        int godinaProizvodnje = 0;
+        String pocetnaCenaString = "";
+        double pocetnaCena = 1000;
+        String kategorijaString = "";
+        KategorijaMuzickeOpreme kategorija = KategorijaMuzickeOpreme.MuzickaPloca;
+        MuzickaOpremaClass noviProizvod;
+        
+        izlazniTokKaKlijentu.println("Unosenje informacija o muzickoj opremi"
+                + "\nUnesite naziv proizvoda: ");
+        try {
+            nazivProizvoda = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        izlazniTokKaKlijentu.println("Unesite naziv proizvodjaca:");
+        try {
+            proizvodjac = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        izlazniTokKaKlijentu.println("Unesite godinu proizvodnje ako je poznata, ako ne napisite nepoznato: ");
+        try {
+            godinaProizvodnjeString = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try{
+            godinaProizvodnje = Integer.parseInt(godinaProizvodnjeString);
+        }catch(Exception e){
+            godinaProizvodnjeString = "nepoznata";
+        }
+        izlazniTokKaKlijentu.println("Unesite kategoriju proizvoda (MuzickaPloca,MuzickiCD,MuzickiInstrument,MuzickiAlbum)");
+        try {
+            kategorijaString = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try{
+            kategorija = KategorijaMuzickeOpreme.valueOf(kategorijaString);
+        }catch(Exception e){
+            izlazniTokKaKlijentu.println("Pogresan unos kategorije!");
+            return;
+        }
+        noviProizvod = new MuzickaOpremaClass(proizvodjac, kategorija, godinaProizvodnje, brojProizvoda++, nazivProizvoda);
+        
+        izlazniTokKaKlijentu.println("Unesite pocetnu cenu (NAPOMENA: Ukoliko je cena uneta nepravilo automatski se nudi po ceni od 1000 dinara):");
+        try {
+            pocetnaCenaString = ulazniTokOdKlijenta.readLine();
+            pocetnaCena = Double.parseDouble(pocetnaCenaString);
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }catch(Exception e){
+            pocetnaCena = 1000;
+        }
+        
+        StavkaProizvodaClass novaStavka = new StavkaProizvodaClass(noviProizvod, username, pocetnaCena, null);
+        
+        proizvodiUBazi.add(novaStavka);
+        
+        dodavanjeProizvodaUBazu();
     }
 
     private void dodavanjeSportskeOpreme() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String nazivProizvoda = "";
+        String marka = "";
+        String model = "";
+        String pocetnaCenaString = "";
+        double pocetnaCena = 1000;
+        SportskaOpremaClass noviProizvod = null;
+        
+        izlazniTokKaKlijentu.println("Unosenje informacija o sportskoj opremi"
+                + "\nUnesite naziv proizvoda: ");
+        try {
+            nazivProizvoda = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        izlazniTokKaKlijentu.println("Unesite marku proizvodjaca:");
+        try {
+            marka = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         izlazniTokKaKlijentu.println("Unesite model proizvoda:");
+        try {
+            model = ulazniTokOdKlijenta.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        noviProizvod = new SportskaOpremaClass(marka, model, brojProizvoda++, nazivProizvoda);
+        
+        izlazniTokKaKlijentu.println("Unesite pocetnu cenu (NAPOMENA: Ukoliko je cena uneta nepravilo automatski se nudi po ceni od 1000 dinara):");
+        try {
+            pocetnaCenaString = ulazniTokOdKlijenta.readLine();
+            pocetnaCena = Double.parseDouble(pocetnaCenaString);
+        } catch (IOException ex) {
+            Logger.getLogger(ServerNitClass.class.getName()).log(Level.SEVERE, null, ex);
+        }catch(Exception e){
+            pocetnaCena = 1000;
+        }
+        
+        StavkaProizvodaClass novaStavka = new StavkaProizvodaClass(noviProizvod, username, pocetnaCena, null);
+        
+        proizvodiUBazi.add(novaStavka);
+        
+        dodavanjeProizvodaUBazu();
     }
 
     private void dodavanjeOstalihProizvoda() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    private void unosProizvodaUBazu(ProizvodClass noviProizvod, double pocetnaCena, String username) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-   
-
    
     public enum izborLogMeni{
         Prijava,

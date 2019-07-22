@@ -17,13 +17,81 @@
   },
   {
     "proizvod": {
-      "autor": "mkdam",
-      "izdavac": "okpokad",
-      "godinaIzdanja": 2001,
       "IDProizvoda": 3,
       "nazivProizvoda": "poapda"
     },
     "vlasnik": "lukadlm97",
     "cena": 900.0
+  },
+  {
+    "proizvod": {
+      "IDProizvoda": 4,
+      "nazivProizvoda": "dpaosd"
+    },
+    "vlasnik": "lukadlm97",
+    "cena": 950.0
+  },
+  {
+    "proizvod": {
+      "IDProizvoda": 5,
+      "nazivProizvoda": "podaso"
+    },
+    "vlasnik": "lukadlm97",
+    "cena": 200.0
+  },
+  {
+    "proizvod": {
+      "IDProizvoda": 6,
+      "nazivProizvoda": "poasdpa"
+    },
+    "vlasnik": "lukadlm97",
+    "cena": 900.0
+  },
+  {
+    "proizvod": {
+      "IDProizvoda": 7,
+      "nazivProizvoda": ""
+    },
+    "vlasnik": "lukadlm97",
+    "cena": 1000.0
+  },
+  {
+    "proizvod": {
+      "IDProizvoda": 8,
+      "nazivProizvoda": ""
+    },
+    "vlasnik": "lukadlm97",
+    "cena": 1000.0
+  },
+  {
+    "proizvod": {
+      "proizvodjac": "koadska",
+      "godinaProizvodnje": 2000,
+      "IDProizvoda": 9,
+      "nazivProizvoda": "poda"
+    },
+    "vlasnik": "lukadlm97",
+    "cena": 5000.0
+  },
+  {
+    "proizvod": {
+      "proizvodjac": "vcxvx",
+      "kategorijaOpreme": "MuzickaPloca",
+      "godinaIzdanja": 2006,
+      "IDProizvoda": 10,
+      "nazivProizvoda": "aopasdo"
+    },
+    "vlasnik": "lukadlm97",
+    "cena": 2000.0
+  },
+  {
+    "proizvod": {
+      "marka": "mkmlk",
+      "model": "cxvxc",
+      "IDProizvoda": 11,
+      "nazivProizvoda": "popda"
+    },
+    "vlasnik": "lukadlm97",
+    "cena": 3000.0
   }
 ]

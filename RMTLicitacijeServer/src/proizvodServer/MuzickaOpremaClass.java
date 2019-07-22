@@ -10,7 +10,7 @@ package proizvodServer;
  * @author Luka
  */
 public class MuzickaOpremaClass extends ProizvodClass{
-    enum KategorijaMuzickeOpreme{
+    public enum KategorijaMuzickeOpreme{
         MuzickaPloca,
         MuzickiCD,
         MuzickiInstrument,
