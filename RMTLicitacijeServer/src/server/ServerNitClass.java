@@ -5,8 +5,11 @@
  */
 package server;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
+import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
+
+
+
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -39,7 +42,7 @@ public class ServerNitClass extends Thread{
     Socket soketZaKomunikaciju = null;
     LinkedList<KorisnikClass> registrovaniKorisnici = new LinkedList<KorisnikClass>();
     LinkedList<KorisnikClass> onlineKorisnici = new LinkedList<KorisnikClass>();
-    LinkedList<StavkaProizvodaClass> proizvodiUBazi = new LinkedList<>();
+    LinkedList<StavkaProizvodaClass> proizvodiUBazi = new LinkedList<StavkaProizvodaClass>();
     String username = null;
     int brojKorisnika = 0;
     int brojProizvoda = 0;
@@ -49,7 +52,12 @@ public class ServerNitClass extends Thread{
         registrovaniKorisnici = korisnici;
         brojKorisnika = korisnici.size() + 1;
         proizvodiUBazi = poizvodi;
-        brojProizvoda = poizvodi.size()+1;
+        if(proizvodiUBazi == null){
+            brojProizvoda = 0;
+            proizvodiUBazi = new LinkedList<StavkaProizvodaClass>();
+        }else{
+             brojProizvoda = poizvodi.size()+1;
+        }
     }
 
     private boolean validacijaUsername(String usernameTemp) {
@@ -262,7 +270,16 @@ public class ServerNitClass extends Thread{
     }
 
     public void dodavanjeProizvodaUBazu(){
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        
+        RuntimeTypeAdapterFactory<ProizvodClass> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+                .of(ProizvodClass.class,"type")
+                .registerSubtype(KnjigaClass.class, "knjigaClass")
+                .registerSubtype(SportskaOpremaClass.class, "sportskaOpremaClass")
+                .registerSubtype(KozmetikaClass.class, "kozmetikaClass")
+                .registerSubtype(MuzickaOpremaClass.class, "muzickaOpremaClass")
+                .registerSubtype(KucniAparatiClass.class, "kucniAparatiClass");
+        
+        Gson gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
        
         try {
             FileWriter upisivac = new FileWriter("files/proizvodi.json");
